@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+  
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  username      String?  @db.VarChar(20)
+  usernameLower String?  @db.VarChar(20)
+  createdAt     DateTime @default(now())
+
+
+  authAccounts     AuthAccount[]
+  platformAccounts PlatformAccount[]
+  platformStats    PlatformStats[]
+  streak           Streak?
+  dailyActivities  DailyActivity[]
+
+  @@unique([usernameLower])
+}
+
+
+
+model AuthAccount {
+  id             String   @id @default(uuid())
+  provider       String   @db.VarChar(20) 
+  providerUserId String   @db.VarChar(255)
+  createdAt      DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+}
+
+
+model Streak {
+  id             String   @id @default(uuid())
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
+  lastActiveDate DateTime?
+  updatedAt      DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+
+model DailyActivity {
+  id            String   @id @default(uuid())
+  date          DateTime // store as YYYY-MM-DD in UTC
+  activityCount Int      @default(0)
+  updatedAt     DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+
+model PlatformAccount {
+  id        String   @id @default(uuid())
+  platform  Platform
+  handle    String   @db.VarChar(50)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([platform, handle])
+}
+
+model PlatformStats {
+  id        String   @id @default(uuid())
+  platform  Platform
+  rating    Int?
+  solved    Int?
+  rawData   Json?
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, platform])
+}
+
+
+enum Platform {
+  cf   // Codeforces
+  lc   // LeetCode
+  cc   // CodeChef
+  ac   // AtCoder
+}
