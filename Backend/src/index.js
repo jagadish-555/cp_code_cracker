@@ -1,8 +1,10 @@
-import {prismaClient} from "@prisma/client";
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
-const prisma = new prismaClient();
+const app = express();
+app.use(cors({
+    origin: process.env.CORS_ORIGIN
+}));
 
-async function main() {
-    const users = await prisma.user.findMany();
-    console.log(users);
-}
+app.use(express.json({limit: '15kb'}));
