@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { prisma } from '../config/prisma.js';
+import { updateStreakAndActivity } from './streak.service.js';
 
 const CODEFORCES_API = 'https://codeforces.com/api';
 
@@ -144,6 +145,8 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
                         solvedAt: new Date(submission.timestamp * 1000)
                     }
                 });
+
+                await updateStreakAndActivity(userId, new Date(submission.timestamp * 1000));
 
                 synced++;
             } catch (error) {

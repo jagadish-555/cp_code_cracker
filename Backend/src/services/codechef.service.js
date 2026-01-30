@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { load } from 'cheerio';
 import { prisma } from '../config/prisma.js';
+import { updateStreakAndActivity } from './streak.service.js';
 
 const CODECHEF_BASE_URL = 'https://www.codechef.com';
 const CODECHEF_SCRAPING_ENABLED = (process.env.CODECHEF_SCRAPING_ENABLED || '').toLowerCase() === 'true';
@@ -326,6 +327,8 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
                         solvedAt
                     }
                 });
+
+                await updateStreakAndActivity(userId, solvedAt ?? new Date());
 
                 synced++;
             } catch (error) {

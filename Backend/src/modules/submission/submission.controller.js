@@ -2,6 +2,7 @@ import { prisma } from '../../config/prisma.js';
 import { syncUserSolvedProblems } from '../../services/codeforces.service.js';
 import { syncUserSolvedLeetCode } from '../../services/leetcode.service.js';
 import { syncUserSolvedCodeChef } from '../../services/codechef.service.js';
+import { updateStreakAndActivity } from '../../services/streak.service.js';
 
 
 export const markProblemAsSolved = async (req, res) => {
@@ -41,6 +42,8 @@ export const markProblemAsSolved = async (req, res) => {
                 solvedAt: new Date()
             }
         });
+
+        await updateStreakAndActivity(userId, new Date());
 
         res.status(200).json({
             message: 'Problem marked as solved',
@@ -163,6 +166,63 @@ export const getUserAttemptedProblems = async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching attempted problems:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+export const getUserStreak = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+
+        const streak = await prisma.streak.findUnique({
+            where: { userId }
+        });
+
+        res.status(200).json({
+            currentStreak: streak?.currentStreak || 0,
+            longestStreak: streak?.longestStreak || 0,
+            lastActiveDate: streak?.lastActiveDate || null
+        });
+    } catch (error) {
+        console.error('Error fetching streak:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+
+export const getUserHeatmap = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const days = Number(req.query.days || 365);
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - days);
+
+        const activity = await prisma.dailyActivity.findMany({
+            where: {
+                userId,
+                date: {
+                    gte: startDate,
+                    lte: endDate
+                }
+            },
+            orderBy: {
+                date: 'asc'
+            }
+        });
+
+        const data = activity.map(item => ({
+            date: item.date.toISOString().slice(0, 10),
+            count: item.activityCount
+        }));
+
+        res.status(200).json({
+            days,
+            data
+        });
+    } catch (error) {
+        console.error('Error fetching heatmap:', error);
         res.status(500).json({ error: error.message });
     }
 };

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { prisma } from '../config/prisma.js';
+import { updateStreakAndActivity } from './streak.service.js';
 
 const LEETCODE_API = 'https://leetcode.com/graphql';
 
@@ -237,6 +238,8 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                         solvedAt: new Date(submission.timestamp * 1000)
                     }
                 });
+
+                await updateStreakAndActivity(userId, new Date(submission.timestamp * 1000));
 
                 synced++;
             } catch (error) {

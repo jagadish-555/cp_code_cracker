@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import authRoutes from './modules/auth/auth.routes.js';
 import problemRoutes from './modules/problem/problem.routes.js';
 import submissionRoutes from './modules/submission/submission.routes.js';
+import friendRoutes from './modules/friend/friend.routes.js';
+import contestRoutes from './modules/contest/contest.routes.js';
 
 const app = express()
 
@@ -21,6 +23,8 @@ app.use(cookieParser())
 app.use('/api/auth', authRoutes);
 app.use('/api/problems', problemRoutes);
 app.use('/api/submissions', submissionRoutes);
+app.use('/api/friends', friendRoutes);
+app.use('/api/contests', contestRoutes);
 
 app.get('/api/health', (req, res) => {
     res.status(200).json({ message: 'Server is running' });

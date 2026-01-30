@@ -1,5 +1,7 @@
 import app from './app.js';
-import {prisma} from './config/prisma.js';
+import { prisma } from './config/prisma.js';
+import { startPlatformStatsSync } from './jobs/syncPlatformStats.js';
+import { startContestSync } from './jobs/syncContests.js';
 
 const PORT = process.env.PORT || 5000;
 
@@ -12,6 +14,9 @@ const startServer = async () =>{
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });
+
+        startPlatformStatsSync();
+        startContestSync();
     } catch (error) {
         console.error("Failed to start the server:", error);
     }

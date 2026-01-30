@@ -4,6 +4,8 @@ import {
     markProblemAsAttempted,
     getUserSolvedProblems,
     getUserAttemptedProblems,
+    getUserStreak,
+    getUserHeatmap,
     syncUserCodeforces,
     syncUserLeetCode,
     syncUserCodeChef,
@@ -24,6 +26,8 @@ router.post('/attempted', markProblemAsAttempted);
 router.get('/solved', getUserSolvedProblems);
 router.get('/attempted', getUserAttemptedProblems);
 router.get('/stats', getUserProblemStats);
+router.get('/streak', getUserStreak);
+router.get('/heatmap', getUserHeatmap);
 
 
 router.post('/sync/codeforces', syncUserCodeforces);

@@ -30,6 +30,9 @@ model User {
   streak           Streak?
   dailyActivities  DailyActivity[]
   userProblems     UserProblem[]
+  friendsInitiated Friendship[] @relation("FriendshipInitiator")
+  friendsReceived  Friendship[] @relation("FriendshipReceiver")
+  contestReminders ContestReminder[]
 
   @@unique([usernameLower])
 }
@@ -147,4 +150,67 @@ model UserProblem {
 enum UserProblemStatus {
   attempted
   solved
+}
+
+model Friendship {
+  id         String           @id @default(uuid())
+  status     FriendshipStatus @default(pending)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  requesterId String
+  addresseeId String
+
+  requester User @relation("FriendshipInitiator", fields: [requesterId], references: [id], onDelete: Cascade)
+  addressee User @relation("FriendshipReceiver", fields: [addresseeId], references: [id], onDelete: Cascade)
+
+  @@unique([requesterId, addresseeId])
+  @@index([requesterId])
+  @@index([addresseeId])
+  @@index([status])
+}
+
+enum FriendshipStatus {
+  pending
+  accepted
+  rejected
+}
+model Contest {
+  id             String   @id @default(uuid())
+  clistId        String   @unique @db.VarChar(50)
+  resource       String   @db.VarChar(100)  // "codeforces.com", "leetcode.com", etc
+  host           String   @db.VarChar(100)  // "Codeforces", "LeetCode", etc
+  event          String   @db.VarChar(255)  // Contest name
+  startTime      DateTime
+  endTime        DateTime
+  duration       Int?                       // Duration in seconds
+  href           String   @db.VarChar(500)  // URL to contest
+  nProblems      Int?                       // Number of problems
+  parsedAt       DateTime @default(now())   // When the contest was fetched from clist.by
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  reminders ContestReminder[]
+
+  @@index([startTime])
+  @@index([resource])
+  @@index([clistId])
+}
+
+model ContestReminder {
+  id           String   @id @default(uuid())
+  reminderTime DateTime // When to send the reminder
+  notified     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userId   String
+  contestId String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contest  Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contestId])
+  @@index([userId])
+  @@index([reminderTime])
+  @@index([notified])
 }
