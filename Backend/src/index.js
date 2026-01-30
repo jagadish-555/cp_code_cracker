@@ -1,10 +1,20 @@
-import express from 'express';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
+import app from './app.js';
+import {prisma} from '.config/prisma.js';
 
-const app = express();
-app.use(cors({
-    origin: process.env.CORS_ORIGIN
-}));
+const PORT = process.env.PORT || 5000;
 
-app.use(express.json({limit: '15kb'}));
+
+const startServer = async () =>{
+    try{
+        await prisma.$connect();
+        console.log("Connected to the database successfully.");
+
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (error) {
+        console.error("Failed to start the server:", error);
+    }
+}
+
+startServer();
