@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { apiClient } from '../api/client';
+import { apiClient, authApi } from '../api/client';
 
 export const LinkPlatformsPage = () => {
   const navigate = useNavigate();
@@ -79,12 +79,22 @@ export const LinkPlatformsPage = () => {
         platformUsername: handle,
       });
       setStatus((prev) => ({ ...prev, [platform]: 'success' }));
-      setLinkedCount((prev) => prev + 1);
+      const newLinkedCount = linkedCount + 1;
+      setLinkedCount(newLinkedCount);
       setHandles((prev) => ({ ...prev, [platform]: '' }));
+
+      // If all 3 platforms are now linked, redirect to dashboard
+      if (newLinkedCount === 3) {
+        // Give user a moment to see success, then redirect
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000);
+      }
     } catch (err) {
       const errorMessage =
         err.response?.data?.message ||
         err.response?.data?.errors?.[0] ||
+        err.response?.data?.error ||
         `Failed to connect ${platform}`;
       setErrors((prev) => ({ ...prev, [platform]: errorMessage }));
       setStatus((prev) => ({ ...prev, [platform]: 'error' }));

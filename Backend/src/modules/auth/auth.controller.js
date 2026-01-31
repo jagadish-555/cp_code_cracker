@@ -100,11 +100,20 @@ export const linkPlatformAccount = async (req, res) => {
         const { platform, platformUsername } = req.validated;
         const userId = req.user.userId;
 
+        // Map frontend platform names to enum values
+        const platformMap = {
+            'codeforces': 'cf',
+            'leetcode': 'lc',
+            'codechef': 'cc'
+        };
+
+        const mappedPlatform = platformMap[platform];
+
         const existingLink = await prisma.platformAccount.findUnique({
             where: {
                 userId_platform: {
                     userId,
-                    platform
+                    platform: mappedPlatform
                 }
             }
         });
@@ -113,15 +122,11 @@ export const linkPlatformAccount = async (req, res) => {
             return res.status(400).json({ error: `${platform} account already linked` });
         }
 
-
-        const url = getPlatformUrl(platform, platformUsername);
-
         const platformAccount = await prisma.platformAccount.create({
             data: {
                 userId,
-                platform,
-                platformUsername,
-                url
+                platform: mappedPlatform,
+                handle: platformUsername
             }
         });
 

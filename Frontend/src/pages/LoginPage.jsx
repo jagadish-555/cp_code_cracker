@@ -50,7 +50,12 @@ export const LoginPage = () => {
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
-      navigate('/dashboard');
+      // Redirect based on platform setup status
+      if (result.needsPlatformSetup) {
+        navigate('/link-platforms');
+      } else {
+        navigate('/dashboard');
+      }
     } else {
       setServerError(result.error);
     }

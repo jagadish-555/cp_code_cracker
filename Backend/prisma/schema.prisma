@@ -87,7 +87,7 @@ model PlatformAccount {
   userId String
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([platform, handle])
+  @@unique([userId, platform])
 }
 
 model PlatformStats {
