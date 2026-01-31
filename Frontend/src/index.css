@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 11 11 15;
+  --foreground: 240 240 240;
+  --card: 17 17 24;
+  --primary: 76 201 240;
+  --secondary: 42 42 53;
+  --border: 42 42 53;
+}
+
+@layer base {
+  body {
+    @apply bg-[#0b0b0f] text-[#f0f0f0] font-sans;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-grotesk font-bold;
+  }
+
+  code, pre {
+    @apply font-mono;
+  }
+}
+
+@layer components {
+  .neo-button {
+    @apply px-4 py-2 border-2 border-[#2a2a35] bg-[#111118] text-[#f0f0f0] font-medium transition-all duration-200 hover:border-[#4cc9f0];
+  }
+
+  .neo-button-primary {
+    @apply px-4 py-2 border-2 border-[#4cc9f0] bg-[#4cc9f0] text-[#0b0b0f] font-medium transition-all duration-200 hover:shadow-lg hover:shadow-[#4cc9f0]/30;
+  }
+
+  .neo-card {
+    @apply bg-[#111118] border-2 border-[#2a2a35] p-6;
+  }
+
+  .neo-input {
+    @apply bg-[#0b0b0f] border-2 border-[#2a2a35] text-[#f0f0f0] px-4 py-2 focus:border-[#4cc9f0] focus:outline-none transition-colors;
+  }
+}
+
