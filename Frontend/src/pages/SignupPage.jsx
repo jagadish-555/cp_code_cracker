@@ -57,7 +57,7 @@ export const SignupPage = () => {
     const result = await signup(formData.email, formData.password, formData.username);
 
     if (result.success) {
-      navigate('/dashboard');
+      navigate('/link-platforms');
     } else {
       setServerError(result.error);
     }

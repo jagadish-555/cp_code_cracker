@@ -4,6 +4,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { SignupPage } from './pages/SignupPage';
 import { LoginPage } from './pages/LoginPage';
+import { LinkPlatformsPage } from './pages/LinkPlatformsPage';
 import { DashboardPage } from './pages/DashboardPage';
 import './index.css';
 
@@ -15,6 +16,14 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route
+            path="/link-platforms"
+            element={
+              <ProtectedRoute>
+                <LinkPlatformsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard"
             element={
               <ProtectedRoute>
@@ -22,7 +31,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/link-platforms" replace />} />
         </Routes>
       </AuthProvider>
     </Router>
