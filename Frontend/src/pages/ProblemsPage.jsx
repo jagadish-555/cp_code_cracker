@@ -41,7 +41,9 @@ export const ProblemsPage = () => {
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [totalCount, setTotalCount] = useState(0);
+
+  console.log('ProblemsPage rendered');
 
   const platforms = [
     { value: 'all', label: 'All Platforms', icon: '🌐' },
@@ -50,15 +52,10 @@ export const ProblemsPage = () => {
     { value: 'cc', label: 'CodeChef', icon: '👨‍💻' },
   ];
 
-  const statusOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'solved', label: 'Solved' },
-    { value: 'attempted', label: 'Attempted' },
-  ];
-
   useEffect(() => {
+    console.log('useEffect triggered for:', { selectedPlatform, page });
     fetchProblems();
-  }, [selectedPlatform, page, statusFilter]);
+  }, [selectedPlatform, page]);
 
   const fetchProblems = async () => {
     try {
@@ -72,17 +69,21 @@ export const ProblemsPage = () => {
         params.platform = selectedPlatform;
       }
 
-      const endpoint = statusFilter === 'solved' 
-        ? '/submissions/solved' 
-        : statusFilter === 'attempted'
-        ? '/submissions/attempted'
-        : '/submissions/solved';
-
-      const res = await apiClient.get(endpoint, { params });
+      console.log('Fetching with params:', params);
+      const res = await apiClient.get('/submissions/solved', { params });
+      console.log('Response received:', res.data);
+      console.log('Problems array:', res.data.problems);
+      console.log('Total count:', res.data.totalCount);
+      
       setProblems(res.data.problems || []);
       setTotalPages(res.data.totalPages || 1);
+      setTotalCount(res.data.totalCount || 0);
     } catch (err) {
-      console.error('Failed to load problems:', err);
+      console.error('API Error:', err);
+      console.error('Error response:', err.response?.data);
+      setProblems([]);
+      setTotalPages(1);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -90,11 +91,6 @@ export const ProblemsPage = () => {
 
   const handlePlatformChange = (platform) => {
     setSelectedPlatform(platform);
-    setPage(1);
-  };
-
-  const handleStatusChange = (status) => {
-    setStatusFilter(status);
     setPage(1);
   };
 
@@ -112,50 +108,33 @@ export const ProblemsPage = () => {
         <h1 className="text-4xl md:text-5xl font-bold text-white font-mono">Problems</h1>
       </div>
 
-      <div className="mb-6 space-y-4">
-        <div>
-          <div className="flex items-center gap-2 mb-3">
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
             <Filter size={16} className="text-white/50" />
-            <p className="text-xs text-white/50 uppercase tracking-wider">Platform</p>
+            <p className="text-xs text-white/50 uppercase tracking-wider">Filter by Platform</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            {platforms.map((platform) => (
-              <button
-                key={platform.value}
-                onClick={() => handlePlatformChange(platform.value)}
-                className={`px-4 py-2 rounded border text-sm font-mono transition-colors ${
-                  selectedPlatform === platform.value
-                    ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300'
-                    : 'bg-neutral-800/50 border-neutral-700/30 text-white/70 hover:border-white/30'
-                }`}
-              >
-                <span className="mr-2">{platform.icon}</span>
-                {platform.label}
-              </button>
-            ))}
-          </div>
+          {totalCount > 0 && (
+            <p className="text-xs text-white/50">
+              {totalCount} problem{totalCount !== 1 ? 's' : ''} solved
+            </p>
+          )}
         </div>
-
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Filter size={16} className="text-white/50" />
-            <p className="text-xs text-white/50 uppercase tracking-wider">Status</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {statusOptions.map((status) => (
-              <button
-                key={status.value}
-                onClick={() => handleStatusChange(status.value)}
-                className={`px-4 py-2 rounded border text-sm font-mono transition-colors ${
-                  statusFilter === status.value
-                    ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
-                    : 'bg-neutral-800/50 border-neutral-700/30 text-white/70 hover:border-white/30'
-                }`}
-              >
-                {status.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-2">
+          {platforms.map((platform) => (
+            <button
+              key={platform.value}
+              onClick={() => handlePlatformChange(platform.value)}
+              className={`px-4 py-2 rounded border text-sm font-mono transition-colors ${
+                selectedPlatform === platform.value
+                  ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300'
+                  : 'bg-neutral-800/50 border-neutral-700/30 text-white/70 hover:border-white/30 hover:bg-white/5'
+              }`}
+            >
+              <span className="mr-2">{platform.icon}</span>
+              {platform.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -197,7 +176,7 @@ export const ProblemsPage = () => {
                         href={problem.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-white hover:text-yellow-300 transition truncate block max-w-xs text-sm inline-flex items-center gap-2 group"
+                        className="text-white hover:text-yellow-300 transition truncate max-w-xs text-sm inline-flex items-center gap-2 group"
                       >
                         <span className="truncate">{problem.title}</span>
                         <ExternalLink size={14} className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -232,33 +211,45 @@ export const ProblemsPage = () => {
             </table>
           </div>
 
-          <div className="flex justify-between items-center mt-6">
-            <p className="text-sm text-white/50">
-              Page {page} of {totalPages}
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => handlePageChange(page - 1)}
-                disabled={page === 1}
-                className="px-4 py-2 rounded border border-neutral-700/30 text-white/70 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <button
-                onClick={() => handlePageChange(page + 1)}
-                disabled={page === totalPages}
-                className="px-4 py-2 rounded border border-neutral-700/30 text-white/70 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
+          {totalPages > 1 && (
+            <div className="flex justify-between items-center mt-6">
+              <p className="text-sm text-white/50">
+                Page {page} of {totalPages} • Showing {problems.length} of {totalCount} problems
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(page - 1)}
+                  disabled={page === 1}
+                  className="px-4 py-2 rounded border border-neutral-700/30 text-white/70 hover:border-white/30 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-mono"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(page + 1)}
+                  disabled={page === totalPages}
+                  className="px-4 py-2 rounded border border-neutral-700/30 text-white/70 hover:border-white/30 hover:bg-white/5 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-mono"
+                >
+                  Next
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </>
       ) : (
         <div className="flex justify-center items-center py-24 border border-neutral-700/30 rounded">
           <div className="text-center">
-            <p className="text-white/50 text-lg mb-2">No problems found</p>
-            <p className="text-white/40 text-sm">Try syncing your submissions or changing filters</p>
+            <p className="text-white/50 text-lg mb-2">
+              {selectedPlatform === 'all' 
+                ? 'No problems solved yet' 
+                : `No ${platforms.find(p => p.value === selectedPlatform)?.label} problems found`
+              }
+            </p>
+            <p className="text-white/40 text-sm">
+              {selectedPlatform === 'all'
+                ? 'Start solving problems and sync your submissions to see them here'
+                : 'Try syncing your submissions or select a different platform'
+              }
+            </p>
           </div>
         </div>
       )}
