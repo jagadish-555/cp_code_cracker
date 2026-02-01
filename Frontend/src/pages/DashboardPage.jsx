@@ -100,7 +100,7 @@ export const DashboardPage = () => {
       try {
         setHeatmapLoading(true);
         const res = await apiClient.get('/submissions/heatmap');
-        setHeatmapData(res.data.heatmap || []);
+        setHeatmapData(res.data || {});
       } catch (err) {
         console.error('Failed to load heatmap:', err);
       } finally {
