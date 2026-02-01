@@ -144,8 +144,12 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
         
         const userStats = await fetchLeetCodeUserStats(leetcodeUsername);
         const submissions = await fetchLeetCodeUserProblems(leetcodeUsername);
-        
+                
         if (submissions.length === 0) {
+            const easySolved = userStats.stats?.find(s => s.difficulty === 'Easy')?.count || 0;
+            const mediumSolved = userStats.stats?.find(s => s.difficulty === 'Medium')?.count || 0;
+            const hardSolved = userStats.stats?.find(s => s.difficulty === 'Hard')?.count || 0;
+
             await prisma.platformStats.upsert({
                 where: {
                     userId_platform: {
@@ -155,20 +159,26 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                 },
                 update: {
                     rating: userStats.totalSolved,
+                    solved: 0,
+                    easySolved,
+                    mediumSolved,
+                    hardSolved,
                     rawData: {
                         lastSync: new Date().toISOString(),
-                        ranking: userStats.ranking,
-                        stats: userStats.stats
+                        ranking: userStats.ranking
                     }
                 },
                 create: {
                     userId,
                     platform: 'lc',
                     rating: userStats.totalSolved,
+                    solved: 0,
+                    easySolved,
+                    mediumSolved,
+                    hardSolved,
                     rawData: {
                         lastSync: new Date().toISOString(),
-                        ranking: userStats.ranking,
-                        stats: userStats.stats
+                        ranking: userStats.ranking
                     }
                 }
             }).catch(() => {});
@@ -251,6 +261,10 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
             }
         }
 
+        const easySolved = userStats.stats?.find(s => s.difficulty === 'Easy')?.count || 0;
+        const mediumSolved = userStats.stats?.find(s => s.difficulty === 'Medium')?.count || 0;
+        const hardSolved = userStats.stats?.find(s => s.difficulty === 'Hard')?.count || 0;
+
         await prisma.platformStats.upsert({
             where: {
                 userId_platform: {
@@ -260,10 +274,13 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
             },
             update: {
                 rating: userStats.totalSolved,
+                solved: synced,
+                easySolved,
+                mediumSolved,
+                hardSolved,
                 rawData: {
                     lastSync: new Date().toISOString(),
                     ranking: userStats.ranking,
-                    stats: userStats.stats,
                     lastSynced: synced,
                     lastCreated: created,
                     lastFailed: failed
@@ -273,10 +290,13 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                 userId,
                 platform: 'lc',
                 rating: userStats.totalSolved,
+                solved: synced,
+                easySolved,
+                mediumSolved,
+                hardSolved,
                 rawData: {
                     lastSync: new Date().toISOString(),
                     ranking: userStats.ranking,
-                    stats: userStats.stats,
                     lastSynced: synced,
                     lastCreated: created
                 }

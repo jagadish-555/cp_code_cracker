@@ -10,7 +10,6 @@ export const apiClient = axios.create({
   },
 });
 
-// Auth endpoints
 export const authApi = {
   signup: (email, password, username) =>
     apiClient.post('/auth/signup', { email, password, username }),
@@ -24,7 +23,6 @@ export const authApi = {
     apiClient.post('/auth/link-platform', { platform, platformUsername }),
 };
 
-// Problems endpoints
 export const problemsApi = {
   getProblems: (page = 1, limit = 20) =>
     apiClient.get('/problems', { params: { page, limit } }),
@@ -36,7 +34,6 @@ export const problemsApi = {
     apiClient.get('/problems/stats'),
 };
 
-// Submissions endpoints
 export const submissionsApi = {
   markSolved: (problemId) =>
     apiClient.post('/submissions/solved', { problemId }),
@@ -60,7 +57,6 @@ export const submissionsApi = {
     apiClient.post('/submissions/sync-codechef', { username }),
 };
 
-// Friends endpoints
 export const friendsApi = {
   sendRequest: (userId) =>
     apiClient.post('/friends/request', { addresseeId: userId }),
@@ -78,7 +74,6 @@ export const friendsApi = {
     apiClient.get(`/friends/compare/${friendId}`),
 };
 
-// Contests endpoints
 export const contestsApi = {
   getUpcomingContests: (days = 30) =>
     apiClient.get('/contests', { params: { days } }),

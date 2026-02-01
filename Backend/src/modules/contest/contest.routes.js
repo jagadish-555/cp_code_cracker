@@ -10,10 +10,8 @@ import {
 
 const router = express.Router();
 
-// Public routes
 router.get("/", getContests);
 
-// Protected routes
 router.post("/sync", verifyJWT, syncContests);
 router.post("/reminder", verifyJWT, addContestReminder);
 router.get("/reminders", verifyJWT, getUserReminders);

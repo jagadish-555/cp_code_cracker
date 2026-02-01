@@ -32,7 +32,6 @@ export const LoginPage = () => {
     setServerError(null);
     setErrors({});
 
-    // Validate
     try {
       loginSchema.parse(formData);
     } catch (err) {
@@ -50,7 +49,6 @@ export const LoginPage = () => {
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
-      // Redirect based on platform setup status
       if (result.needsPlatformSetup) {
         navigate('/link-platforms');
       } else {
@@ -65,13 +63,11 @@ export const LoginPage = () => {
   return (
     <div className="min-h-screen bg-[#0b0b0f] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-grotesk font-bold text-[#f0f0f0] mb-2">CodeCrakr</h1>
           <p className="text-[#a0a0a0]">Track. Compete. Improve.</p>
         </div>
 
-        {/* Login Card */}
         <div className="neo-card mb-6">
           <h2 className="text-2xl font-grotesk font-bold text-[#f0f0f0] mb-6">Welcome Back</h2>
 
@@ -82,7 +78,6 @@ export const LoginPage = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-[#f0f0f0] mb-1">Email</label>
               <input
@@ -96,7 +91,6 @@ export const LoginPage = () => {
               {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-[#f0f0f0] mb-1">Password</label>
               <input
@@ -110,7 +104,6 @@ export const LoginPage = () => {
               {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -121,7 +114,6 @@ export const LoginPage = () => {
           </form>
         </div>
 
-        {/* Signup Link */}
         <p className="text-center text-[#a0a0a0]">
           Don't have an account?{' '}
           <Link to="/signup" className="text-[#4cc9f0] hover:underline font-medium">

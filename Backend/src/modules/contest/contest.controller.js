@@ -8,13 +8,9 @@ import asyncHandler from "../../utils/asyncHandler.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 import { ApiError } from "../../utils/ApiError.js";
 
-/**
- * Get upcoming contests
- * Query params: daysAhead (default 30), resource (optional filter)
- */
 const getContests = asyncHandler(async (req, res) => {
   const { daysAhead = 30, resource } = req.query;
-  const days = Math.min(parseInt(daysAhead) || 30, 90); // Cap at 90 days
+  const days = Math.min(parseInt(daysAhead) || 30, 90);
 
   let contests;
   if (resource) {
@@ -31,9 +27,6 @@ const getContests = asyncHandler(async (req, res) => {
   );
 });
 
-/**
- * Manually trigger contest sync
- */
 const syncContests = asyncHandler(async (req, res) => {
   const result = await fetchAndSyncContests();
 
@@ -50,10 +43,6 @@ const syncContests = asyncHandler(async (req, res) => {
   );
 });
 
-/**
- * Add reminder for a contest
- * Body: { contestId, reminderMinutesBefore }
- */
 const addContestReminder = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { contestId, reminderMinutesBefore = 60 } = req.body;
@@ -62,7 +51,6 @@ const addContestReminder = asyncHandler(async (req, res) => {
     throw new ApiError(400, "contestId is required");
   }
 
-  // Verify contest exists
   const contest = await prisma.contest.findUnique({
     where: { id: contestId },
   });
@@ -71,12 +59,10 @@ const addContestReminder = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Contest not found");
   }
 
-  // Calculate reminder time
   const reminderTime = new Date(
     contest.startTime.getTime() - reminderMinutesBefore * 60 * 1000
   );
 
-  // Upsert reminder
   const reminder = await prisma.contestReminder.upsert({
     where: {
       userId_contestId: {
@@ -111,10 +97,6 @@ const addContestReminder = asyncHandler(async (req, res) => {
   );
 });
 
-/**
- * Get user's contest reminders
- * Query params: upcoming (true/false, default true)
- */
 const getUserReminders = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { upcoming = true } = req.query;
@@ -160,15 +142,10 @@ const getUserReminders = asyncHandler(async (req, res) => {
   );
 });
 
-/**
- * Remove contest reminder
- * Params: reminderId
- */
 const removeContestReminder = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { reminderId } = req.params;
 
-  // Verify reminder belongs to user
   const reminder = await prisma.contestReminder.findUnique({
     where: { id: reminderId },
   });
@@ -188,9 +165,6 @@ const removeContestReminder = asyncHandler(async (req, res) => {
   );
 });
 
-/**
- * Generate Google Calendar link for a contest
- */
 function generateCalendarLink(contest) {
   const title = encodeURIComponent(contest.event);
   const description = encodeURIComponent(

@@ -56,6 +56,7 @@ model Streak {
   id             String   @id @default(uuid())
   currentStreak  Int      @default(0)
   longestStreak  Int      @default(0)
+  maxStreak      Int      @default(0)
   lastActiveDate DateTime?
   updatedAt      DateTime @updatedAt
 
@@ -91,12 +92,28 @@ model PlatformAccount {
 }
 
 model PlatformStats {
-  id        String   @id @default(uuid())
-  platform  Platform
-  rating    Int?
-  solved    Int?
-  rawData   Json?
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  platform      Platform
+  
+  // Common fields
+  rating        Int?
+  solved        Int?
+  
+  // Codeforces specific
+  maxRating     Int?
+  title         String?
+  
+  // LeetCode specific
+  easySolved    Int?
+  mediumSolved  Int?
+  hardSolved    Int?
+  
+  // CodeChef specific
+  stars         Int?
+  
+  // Raw data for any platform-specific info
+  rawData       Json?
+  updatedAt     DateTime @updatedAt
 
   userId String
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)

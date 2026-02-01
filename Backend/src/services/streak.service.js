@@ -29,6 +29,7 @@ export const updateStreakAndActivity = async (userId, solvedAt) => {
                 const lastActiveDate = streak?.lastActiveDate ? toDateOnly(streak.lastActiveDate) : null;
                 let currentStreak = streak?.currentStreak || 0;
                 let longestStreak = streak?.longestStreak || 0;
+                let maxStreak = streak?.maxStreak || 0;
 
                 if (!lastActiveDate) {
                     currentStreak = 1;
@@ -41,6 +42,10 @@ export const updateStreakAndActivity = async (userId, solvedAt) => {
                     }
                 }
 
+                if (currentStreak > maxStreak) {
+                    maxStreak = currentStreak;
+                }
+                
                 if (currentStreak > longestStreak) {
                     longestStreak = currentStreak;
                 }
@@ -50,12 +55,14 @@ export const updateStreakAndActivity = async (userId, solvedAt) => {
                     update: {
                         currentStreak,
                         longestStreak,
+                        maxStreak,
                         lastActiveDate: today
                     },
                     create: {
                         userId,
                         currentStreak,
                         longestStreak,
+                        maxStreak,
                         lastActiveDate: today
                     }
                 });

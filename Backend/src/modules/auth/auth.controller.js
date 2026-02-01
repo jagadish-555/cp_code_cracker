@@ -1,10 +1,8 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../config/prisma.js';
-// ↑ Added semicolon
 
 import { generateToken } from '../../middlewares/auth.middleware.js';
 
-// Helper function to generate correct platform URLs
 const getPlatformUrl = (platform, username) => {
     const urls = {
         leetcode: `https://leetcode.com/u/${username}/`,
@@ -100,7 +98,6 @@ export const linkPlatformAccount = async (req, res) => {
         const { platform, platformUsername } = req.validated;
         const userId = req.user.userId;
 
-        // Map frontend platform names to enum values
         const platformMap = {
             'codeforces': 'cf',
             'leetcode': 'lc',
@@ -147,7 +144,14 @@ export const getCurrentUser = async (req, res) => {
             where: { id: userId },
             include: {
                 platformAccounts: true,
-                streak: true
+                platformStats: true,
+                streak: true,
+                userProblems: {
+                    select: {
+                        status: true,
+                        problemId: true
+                    }
+                }
             }
         });
 

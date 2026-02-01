@@ -8,7 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Helper to check if user has all 3 required platforms linked
   const hasAllPlatforms = (userData) => {
     if (!userData?.platformAccounts) return false;
     const platforms = userData.platformAccounts.map(acc => acc.platform);
@@ -42,7 +41,6 @@ export const AuthProvider = ({ children }) => {
       let errorMessage = 'Signup failed';
       
       if (err.response?.data?.error) {
-        // Array of errors
         if (Array.isArray(err.response.data.error)) {
           errorMessage = err.response.data.error.join(', ');
         } else {
@@ -64,11 +62,9 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const response = await authApi.login(email, password);
       
-      // Fetch full user data with platform accounts
       const userResponse = await authApi.getCurrentUser();
       setUser(userResponse.data.user);
       
-      // Check if user has all platforms linked
       const needsPlatformSetup = !hasAllPlatforms(userResponse.data.user);
       
       return { 

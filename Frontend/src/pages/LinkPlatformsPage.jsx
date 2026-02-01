@@ -83,9 +83,7 @@ export const LinkPlatformsPage = () => {
       setLinkedCount(newLinkedCount);
       setHandles((prev) => ({ ...prev, [platform]: '' }));
 
-      // If all 3 platforms are now linked, redirect to dashboard
       if (newLinkedCount === 3) {
-        // Give user a moment to see success, then redirect
         setTimeout(() => {
           navigate('/dashboard');
         }, 1000);
@@ -108,7 +106,6 @@ export const LinkPlatformsPage = () => {
   return (
     <div className="min-h-screen bg-[#0b0b0f] p-8">
       <div className="max-w-2xl mx-auto">
-        {/* Header */}
         <div className="mb-12 text-center">
           <h1 className="text-4xl font-grotesk font-bold text-[#f0f0f0] mb-2">
             Connect Your Accounts
@@ -119,7 +116,6 @@ export const LinkPlatformsPage = () => {
           </p>
         </div>
 
-        {/* Progress Indicator */}
         <div className="mb-8 text-center">
           <div className="inline-block neo-card">
             <p className="text-[#a0a0a0]">
@@ -129,7 +125,6 @@ export const LinkPlatformsPage = () => {
           </div>
         </div>
 
-        {/* Platform Cards */}
         <div className="grid gap-6 mb-8">
           {platforms.map((platform) => (
             <div key={platform.key} className="neo-card">
@@ -161,7 +156,6 @@ export const LinkPlatformsPage = () => {
                 )}
               </div>
 
-              {/* Input & Button */}
               <div className="flex gap-3">
                 <input
                   type="text"
@@ -184,7 +178,6 @@ export const LinkPlatformsPage = () => {
                 </button>
               </div>
 
-              {/* Error Message */}
               {errors[platform.key] && (
                 <p className="text-red-400 text-sm mt-2">{errors[platform.key]}</p>
               )}
@@ -192,7 +185,6 @@ export const LinkPlatformsPage = () => {
           ))}
         </div>
 
-        {/* Proceed Button - Disabled until all 3 are linked */}
         <div className="text-center">
           <button
             onClick={() => navigate('/dashboard')}
@@ -207,7 +199,6 @@ export const LinkPlatformsPage = () => {
           </button>
         </div>
 
-        {/* Info Text */}
         <p className="text-center text-[#a0a0a0] text-sm mt-8 max-w-lg mx-auto">
           Your handles are used to sync your problems and stats from each platform. You can update
           them later from your profile settings.

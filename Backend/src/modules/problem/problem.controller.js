@@ -1,6 +1,5 @@
 import { prisma } from '../../config/prisma.js';
 
-// Get all problems
 export const getAllProblems = async (req, res) => {
     try {
         const { platform, difficulty, page = 1, limit = 50 } = req.query;
@@ -36,7 +35,6 @@ export const getAllProblems = async (req, res) => {
     }
 };
 
-// Get single problem by ID
 export const getProblemById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -56,7 +54,6 @@ export const getProblemById = async (req, res) => {
     }
 };
 
-// Search problems by title
 export const searchProblems = async (req, res) => {
     try {
         const { query, platform } = req.query;
@@ -88,7 +85,6 @@ export const searchProblems = async (req, res) => {
     }
 };
 
-// Sync problems endpoint - now handled on-demand when users sync their handle
 export const syncProblems = async (req, res) => {
     try {
         res.status(200).json({
@@ -101,7 +97,6 @@ export const syncProblems = async (req, res) => {
     }
 };
 
-// Get problem statistics
 export const getProblemStats = async (req, res) => {
     try {
         const stats = await prisma.problem.groupBy({

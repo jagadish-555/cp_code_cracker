@@ -53,7 +53,6 @@ export const fetchUserSubmissions = async (handle) => {
             throw new Error(`User ${handle} not found on Codeforces`);
         }
 
-        // Get only accepted submissions with full problem details
         const acceptedSubmissions = response.data.result
             .filter(s => s.verdict === 'OK')
             .map(s => ({
@@ -171,9 +170,11 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
             },
             update: {
                 rating: userStats.rating,
+                solved: synced,
+                maxRating: userStats.maxRating,
+                title: userStats.rank || 'Unrated',
                 rawData: {
                     lastSync: new Date().toISOString(),
-                    maxRating: userStats.maxRating,
                     rank: userStats.rank,
                     maxRank: userStats.maxRank,
                     lastSynced: synced,
@@ -185,9 +186,11 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
                 userId,
                 platform: 'cf',
                 rating: userStats.rating,
+                solved: synced,
+                maxRating: userStats.maxRating,
+                title: userStats.rank || 'Unrated',
                 rawData: {
                     lastSync: new Date().toISOString(),
-                    maxRating: userStats.maxRating,
                     rank: userStats.rank,
                     maxRank: userStats.maxRank,
                     lastSynced: synced,

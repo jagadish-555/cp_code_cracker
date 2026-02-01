@@ -109,7 +109,11 @@ export const markProblemAsAttempted = async (req, res) => {
 export const getUserSolvedProblems = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { platform } = req.query;
+        const { platform, page = 1, limit = 10 } = req.query;
+
+        const pageNum = Math.max(1, parseInt(page) || 1);
+        const limitNum = Math.max(1, Math.min(100, parseInt(limit) || 10));
+        const skip = (pageNum - 1) * limitNum;
 
         const where = {
             userId,
@@ -122,6 +126,9 @@ export const getUserSolvedProblems = async (req, res) => {
             };
         }
 
+        const totalCount = await prisma.userProblem.count({ where });
+        const totalPages = Math.ceil(totalCount / limitNum);
+
         const solvedProblems = await prisma.userProblem.findMany({
             where,
             include: {
@@ -129,12 +136,22 @@ export const getUserSolvedProblems = async (req, res) => {
             },
             orderBy: {
                 solvedAt: 'desc'
-            }
+            },
+            skip,
+            take: limitNum
         });
 
         res.status(200).json({
-            solved: solvedProblems,
-            count: solvedProblems.length
+            problems: solvedProblems.map(up => ({
+                ...up.problem,
+                solvedAt: up.solvedAt,
+                status: up.status
+            })),
+            count: solvedProblems.length,
+            totalCount,
+            page: pageNum,
+            limit: limitNum,
+            totalPages
         });
     } catch (error) {
         console.error('Error fetching solved problems:', error);
@@ -194,10 +211,19 @@ export const getUserStreak = async (req, res) => {
 export const getUserHeatmap = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const days = Number(req.query.days || 365);
+        
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { createdAt: true }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         const endDate = new Date();
-        const startDate = new Date();
-        startDate.setDate(endDate.getDate() - days);
+        const startDate = new Date(user.createdAt);
+        startDate.setHours(0, 0, 0, 0);
 
         const activity = await prisma.dailyActivity.findMany({
             where: {
@@ -212,14 +238,15 @@ export const getUserHeatmap = async (req, res) => {
             }
         });
 
-        const data = activity.map(item => ({
+        const heatmap = activity.map(item => ({
             date: item.date.toISOString().slice(0, 10),
-            count: item.activityCount
+            activityCount: item.activityCount
         }));
 
         res.status(200).json({
-            days,
-            data
+            startDate: startDate.toISOString().slice(0, 10),
+            endDate: endDate.toISOString().slice(0, 10),
+            heatmap
         });
     } catch (error) {
         console.error('Error fetching heatmap:', error);
@@ -231,13 +258,21 @@ export const getUserHeatmap = async (req, res) => {
 export const syncUserCodeforces = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { handle } = req.body;
 
-        if (!handle) {
-            return res.status(400).json({ error: 'Codeforces handle is required' });
+        const platformAccount = await prisma.platformAccount.findUnique({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: 'cf'
+                }
+            }
+        });
+
+        if (!platformAccount) {
+            return res.status(400).json({ error: 'Codeforces account not linked' });
         }
 
-        const result = await syncUserSolvedProblems(userId, handle);
+        const result = await syncUserSolvedProblems(userId, platformAccount.handle);
 
         res.status(200).json({
             message: 'Codeforces submissions synced successfully',
@@ -253,13 +288,21 @@ export const syncUserCodeforces = async (req, res) => {
 export const syncUserLeetCode = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { username } = req.body;
 
-        if (!username) {
-            return res.status(400).json({ error: 'LeetCode username is required' });
+        const platformAccount = await prisma.platformAccount.findUnique({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: 'lc'
+                }
+            }
+        });
+
+        if (!platformAccount) {
+            return res.status(400).json({ error: 'LeetCode account not linked' });
         }
 
-        const result = await syncUserSolvedLeetCode(userId, username);
+        const result = await syncUserSolvedLeetCode(userId, platformAccount.handle);
 
         res.status(200).json({
             message: 'LeetCode submissions synced successfully',
@@ -275,29 +318,29 @@ export const syncUserLeetCode = async (req, res) => {
 export const syncUserCodeChef = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const { username } = req.body;
 
-        if (!username) {
-            return res.status(400).json({ error: 'CodeChef username is required' });
+        const platformAccount = await prisma.platformAccount.findUnique({
+            where: {
+                userId_platform: {
+                    userId,
+                    platform: 'cc'
+                }
+            }
+        });
+
+        if (!platformAccount) {
+            return res.status(400).json({ error: 'CodeChef account not linked' });
         }
 
-        const result = await syncUserSolvedCodeChef(userId, username);
+        const result = await syncUserSolvedCodeChef(userId, platformAccount.handle);
 
         res.status(200).json({
             message: 'CodeChef submissions synced successfully',
             result
         });
     } catch (error) {
-        res.status(200).json({
-            message: 'CodeChef submissions synced successfully',
-            result: {
-                synced: 0,
-                created: 0,
-                failed: 0,
-                total: 0,
-                message: error.message
-            }
-        });
+        console.error('Error syncing CodeChef submissions:', error);
+        res.status(500).json({ error: error.message });
     }
 };
 

@@ -39,7 +39,6 @@ export const SignupPage = () => {
     setServerError(null);
     setErrors({});
 
-    // Validate
     try {
       signupSchema.parse(formData);
     } catch (err) {
@@ -67,13 +66,11 @@ export const SignupPage = () => {
   return (
     <div className="min-h-screen bg-[#0b0b0f] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-grotesk font-bold text-[#f0f0f0] mb-2">CodeCrakr</h1>
           <p className="text-[#a0a0a0]">Track. Compete. Improve.</p>
         </div>
 
-        {/* Signup Card */}
         <div className="neo-card mb-6">
           <h2 className="text-2xl font-grotesk font-bold text-[#f0f0f0] mb-6">Create Account</h2>
 
@@ -84,7 +81,6 @@ export const SignupPage = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-[#f0f0f0] mb-1">Email</label>
               <input
@@ -98,7 +94,6 @@ export const SignupPage = () => {
               {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
             </div>
 
-            {/* Username */}
             <div>
               <label className="block text-sm font-medium text-[#f0f0f0] mb-1">Username</label>
               <input
@@ -112,7 +107,6 @@ export const SignupPage = () => {
               {errors.username && <p className="text-red-400 text-sm mt-1">{errors.username}</p>}
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-[#f0f0f0] mb-1">Password</label>
               <input
@@ -126,7 +120,6 @@ export const SignupPage = () => {
               {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password}</p>}
             </div>
 
-            {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-[#f0f0f0] mb-1">Confirm Password</label>
               <input
@@ -140,7 +133,6 @@ export const SignupPage = () => {
               {errors.confirmPassword && <p className="text-red-400 text-sm mt-1">{errors.confirmPassword}</p>}
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -151,7 +143,6 @@ export const SignupPage = () => {
           </form>
         </div>
 
-        {/* Login Link */}
         <p className="text-center text-[#a0a0a0]">
           Already have an account?{' '}
           <Link to="/login" className="text-[#4cc9f0] hover:underline font-medium">

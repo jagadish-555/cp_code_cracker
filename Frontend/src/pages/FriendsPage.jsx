@@ -35,45 +35,43 @@ export const DashboardPage = () => {
         
         const totalSolved = userData.userProblems?.filter(p => p.status === 'solved')?.length || 0;
         const currentStreak = userData.streak?.currentStreak || 0;
-        const maxStreak = userData.streak?.maxStreak || userData.streak?.longestStreak || 0;
-        const cpScore = Math.round((totalSolved * 10) + (currentStreak * 5));
+        const maxStreak = userData.streak?.longestStreak || 0;
 
         setStats({
           totalSolved,
           currentStreak,
           maxStreak,
-          cpScore,
         });
 
         const formattedPlatformStats = {};
         
-        if (userData.platformStats && Array.isArray(userData.platformStats)) {
-          userData.platformStats.forEach((stat) => {
-            if (stat.platform === 'cf') {
-              formattedPlatformStats.codeforces = {
-                solved: stat.solved || 0,
-                currentRating: stat.rating || '—',
-                maxRating: stat.maxRating || '—',
-                title: stat.title || '—',
-              };
-            } else if (stat.platform === 'lc') {
-              formattedPlatformStats.leetcode = {
-                rating: stat.rating || '—',
-                totalSolved: stat.solved || 0,
-                easySolved: stat.easySolved || 0,
-                mediumSolved: stat.mediumSolved || 0,
-                hardSolved: stat.hardSolved || 0,
-              };
-            } else if (stat.platform === 'cc') {
-              formattedPlatformStats.codechef = {
-                rating: stat.rating || '—',
-                maxRating: stat.maxRating || '—',
-                totalSolved: stat.solved || 0,
-                stars: stat.stars || 0,
-              };
-            }
-          });
-        }
+        userData.platformAccounts?.forEach((acc) => {
+          const platformStat = userData.platformStats?.find(ps => ps.platform === acc.platform);
+          
+          if (acc.platform === 'cf') {
+            formattedPlatformStats.codeforces = {
+              solved: platformStat?.solved || 0,
+              currentRating: platformStat?.rating || 0,
+              maxRating: platformStat?.maxRating || 0,
+              title: platformStat?.title || '—',
+            };
+          } else if (acc.platform === 'lc') {
+            formattedPlatformStats.leetcode = {
+              rating: platformStat?.rating || '—',
+              totalSolved: platformStat?.solved || 0,
+              easySolved: platformStat?.easySolved || 0,
+              mediumSolved: platformStat?.mediumSolved || 0,
+              hardSolved: platformStat?.hardSolved || 0,
+            };
+          } else if (acc.platform === 'cc') {
+            formattedPlatformStats.codechef = {
+              rating: platformStat?.rating || '—',
+              maxRating: platformStat?.maxRating || '—',
+              totalSolved: platformStat?.solved || 0,
+              stars: platformStat?.stars || 0,
+            };
+          }
+        });
 
         setPlatformStats(formattedPlatformStats);
       } catch (err) {
@@ -87,8 +85,7 @@ export const DashboardPage = () => {
       try {
         setContestsLoading(true);
         const res = await apiClient.get('/contests');
-        const contestsList = res.data?.data?.contests || res.data?.contests || [];
-        setContests(contestsList.slice(0, 5));
+        setContests(res.data.contests?.slice(0, 5) || []);
       } catch (err) {
         console.error('Failed to load contests:', err);
       } finally {

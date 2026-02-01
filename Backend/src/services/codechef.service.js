@@ -256,7 +256,10 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
                     }
                 },
                 data: {
-                    rating: userStats.rating
+                    rating: userStats.rating,
+                    solved: 0,
+                    maxRating: userStats.rating,
+                    stars: 0
                 }
             }).catch(() => {});
 
@@ -358,7 +361,10 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
                 }
             },
             data: {
-                rating: userStats.rating
+                rating: userStats.rating,
+                solved: synced,
+                maxRating: userStats.rating,
+                stars: synced > 0 ? Math.ceil(synced / 50) : 0
             }
         }).catch(() => {});
 

@@ -5,11 +5,6 @@ const CLIST_API_URL = "https://clist.by/api/v4/contest";
 const CLIST_TOKEN = process.env.CLIST_API_TOKEN;
 const CLIST_USERNAME = process.env.CLIST_USERNAME;
 
-/**
- * Fetch and sync contests from clist.by API
- * Only fetches contests for specified resources (Codeforces, LeetCode, CodeChef)
- * @returns {Promise<Object>} { success, count, error? }
- */
 async function fetchAndSyncContests() {
   try {
     if (!CLIST_TOKEN) {
@@ -78,7 +73,6 @@ async function fetchAndSyncContests() {
         console.error(
           `Error upserting contest ${contest.id}: ${err.message}`
         );
-        // Continue with next contest
       }
     }
 
@@ -96,12 +90,6 @@ async function fetchAndSyncContests() {
   }
 }
 
-/**
- * Get upcoming contests for a given time range
- * @param {Date} startDate
- * @param {Date} endDate
- * @returns {Promise<Array>}
- */
 async function getUpcomingContests(startDate = new Date(), daysAhead = 30) {
   try {
     const endDate = new Date(
@@ -125,12 +113,6 @@ async function getUpcomingContests(startDate = new Date(), daysAhead = 30) {
   }
 }
 
-/**
- * Get contests by resource
- * @param {String} resource - e.g., "codeforces.com", "leetcode.com"
- * @param {Number} daysAhead - number of days to look ahead
- * @returns {Promise<Array>}
- */
 async function getContestsByResource(resource, daysAhead = 30) {
   try {
     const now = new Date();
