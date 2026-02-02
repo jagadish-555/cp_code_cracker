@@ -13,6 +13,48 @@ const getCooldownMs = () => {
     return hours * 60 * 60 * 1000;
 };
 
+// Parse CodeChef date format: "HH:MM AM/PM DD/MM/YY"
+// Example: "01:34 PM 04/04/25"
+// CodeChef uses DD/MM/YY format (Indian date format)
+// CodeChef displays times in IST (UTC+5:30), we convert to UTC for storage
+const parseCodeChefDate = (dateString) => {
+    if (!dateString) return null;
+
+    const match = dateString.match(
+        /(\d{1,2}):(\d{2})\s(AM|PM)\s(\d{1,2})\/(\d{1,2})\/(\d{2})/
+    );
+
+    if (!match) {
+        console.warn(`CodeChef date didn't match pattern: ${dateString}`);
+        return null;
+    }
+
+    let [, hours, minutes, meridiem, day, month, year] = match;
+
+    hours = parseInt(hours, 10);
+    minutes = parseInt(minutes, 10);
+    day = parseInt(day, 10);
+    month = parseInt(month, 10) - 1; // JavaScript months are 0-indexed
+    year = parseInt(year, 10) + 2000; // CodeChef years are always 20xx
+
+    if (meridiem === 'PM' && hours !== 12) hours += 12;
+    if (meridiem === 'AM' && hours === 12) hours = 0;
+
+    // Create IST datetime in UTC
+    const date = new Date(Date.UTC(year, month, day, hours, minutes));
+
+    // Convert IST → UTC (subtract 5:30 hours)
+    date.setTime(date.getTime() - 5.5 * 60 * 60 * 1000);
+
+    if (Number.isNaN(date.getTime())) {
+        console.warn(`CodeChef date resulted in invalid date: ${dateString}`);
+        return null;
+    }
+
+    console.log(`Parsed CodeChef date: "${dateString}" (IST) -> ${date.toISOString()} (UTC)`);
+    return date;
+};
+
 const normalizeRawData = (rawData) => {
     if (!rawData) return {};
     if (typeof rawData === 'string') {
@@ -151,12 +193,15 @@ export const fetchCodeChefSubmissions = async (username) => {
                             const fullUrl = `https://www.codechef.com/${contestCode}/problems/${problemCode}`;
                             
                             if (!problems.has(problemCode)) {
+                                // Parse CodeChef date format: "HH:MM AM/PM MM/DD/YY"
+                                const parsedTime = parseCodeChefDate(timeTitle);
+                                
                                 problems.set(problemCode, {
                                     name: problemName,
                                     link: fullUrl,
                                     contestCode: contestCode,
                                     problemCode: problemCode,
-                                    submissionTime: timeTitle,
+                                    submissionTime: parsedTime || timeTitle,
                                     result: resultStatus,
                                     language: language,
                                 });
@@ -283,6 +328,13 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
         for (const submission of submissions) {
             try {
                 const platformProblemId = `${submission.contestCode}:${submission.problemCode}`;
+                
+                console.log(`Processing submission:`, {
+                    problemCode: submission.problemCode,
+                    submissionTime: submission.submissionTime,
+                    submissionTimeType: typeof submission.submissionTime,
+                    isDate: submission.submissionTime instanceof Date
+                });
 
                 let problem = await prisma.problem.findUnique({
                     where: {
@@ -308,8 +360,19 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
                     created++;
                 }
 
-                const parsedDate = submission.submissionTime ? new Date(submission.submissionTime) : null;
-                const solvedAt = parsedDate && !Number.isNaN(parsedDate.getTime()) ? parsedDate : null;
+                let solvedAt = null;
+                if (submission.submissionTime) {
+                    // If it's already a Date object, use it directly
+                    if (submission.submissionTime instanceof Date) {
+                        solvedAt = !Number.isNaN(submission.submissionTime.getTime()) ? submission.submissionTime : null;
+                    } else {
+                        // Otherwise try to parse it
+                        const parsedDate = new Date(submission.submissionTime);
+                        solvedAt = !Number.isNaN(parsedDate.getTime()) ? parsedDate : null;
+                    }
+                }
+                
+                console.log(`Final solvedAt for ${submission.problemCode}:`, solvedAt?.toISOString() || 'null');
 
                 await prisma.userProblem.upsert({
                     where: {

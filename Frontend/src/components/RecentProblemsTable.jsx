@@ -13,14 +13,22 @@ const formatDate = (date) => {
   if (!date) return '—';
   const d = new Date(date);
   const now = new Date();
-  const diff = now - d;
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  
+  // Check if same calendar day
+  const dDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffMs = nowDate - dDate;
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  
   if (days === 0) return 'today';
   if (days === 1) return '1 day ago';
   if (days < 30) return `${days} days ago`;
-  const months = Math.floor(days / 30);
-  if (months === 1) return '1 month ago';
-  return `${months} months ago`;
+  if (days < 365) {
+    const months = Math.floor(days / 30);
+    return months === 1 ? '1 month ago' : `${months} months ago`;
+  }
+  const years = Math.floor(days / 365);
+  return years === 1 ? '1 year ago' : `${years} years ago`;
 };
 
 export const RecentProblemsTable = ({ problems, loading, onPageChange, page, totalPages }) => {

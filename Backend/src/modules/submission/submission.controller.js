@@ -117,7 +117,10 @@ export const getUserSolvedProblems = async (req, res) => {
 
         const where = {
             userId,
-            status: 'solved'
+            status: 'solved',
+            solvedAt: {
+                not: null
+            }
         };
 
         if (platform) {
