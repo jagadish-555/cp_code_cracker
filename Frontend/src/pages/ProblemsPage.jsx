@@ -23,32 +23,16 @@ const getPlatformIcon = (platform) => {
 
 const formatDate = (date) => {
   if (!date) return '—';
-
   const d = new Date(date);
-  if (isNaN(d)) return '—';
-
   const now = new Date();
-
-  // Normalize to UTC midnight
-  const dUTC = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-  const nowUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-
-  const diffMs = nowUTC - dUTC;
-  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (days === 0) return 'Today';
+  const diff = now - d;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) return 'today';
   if (days === 1) return '1 day ago';
   if (days < 30) return `${days} days ago`;
-
-  const months =
-    (now.getUTCFullYear() - d.getUTCFullYear()) * 12 +
-    (now.getUTCMonth() - d.getUTCMonth());
-
-  if (months < 12)
-    return months === 1 ? '1 month ago' : `${months} months ago`;
-
-  const years = now.getUTCFullYear() - d.getUTCFullYear();
-  return years === 1 ? '1 year ago' : `${years} years ago`;
+  const months = Math.floor(days / 30);
+  if (months === 1) return '1 month ago';
+  return `${months} months ago`;
 };
 
 export const ProblemsPage = () => {

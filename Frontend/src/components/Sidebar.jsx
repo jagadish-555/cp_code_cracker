@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, BookOpen, User, LogOut } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Users, User, LogOut } from 'lucide-react';
 
 export const Sidebar = ({ onClose }) => {
   const location = useLocation();
@@ -21,6 +21,12 @@ export const Sidebar = ({ onClose }) => {
       items: [
         { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
         { name: 'Problems', path: '/problems', icon: BookOpen },
+      ],
+    },
+    {
+      title: 'SOCIAL',
+      items: [
+        { name: 'Friends', path: '/friends', icon: Users },
       ],
     },
     {
