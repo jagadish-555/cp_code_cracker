@@ -6,12 +6,15 @@ import problemRoutes from './modules/problem/problem.routes.js';
 import submissionRoutes from './modules/submission/submission.routes.js';
 import friendRoutes from './modules/friend/friend.routes.js';
 import contestRoutes from './modules/contest/contest.routes.js';
-
+import 'dotenv/config.js';
 const app = express()
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
+    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    exposedHeaders: ['Set-Cookie']
 }))
 
 app.use(express.json({limit: "16kb"}))

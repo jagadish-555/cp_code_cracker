@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { load } from 'cheerio';
 import { prisma } from '../config/prisma.js';
-import { updateStreakAndActivity } from './streak.service.js';
+import { bulkUpdateActivity } from './streak.service.js';
 
 const CODECHEF_BASE_URL = 'https://www.codechef.com';
 const CODECHEF_SCRAPING_ENABLED = (process.env.CODECHEF_SCRAPING_ENABLED || '').toLowerCase() === 'true';
@@ -279,6 +279,7 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
         let synced = 0;
         let created = 0;
         let failed = 0;
+        const solvedDates = [];
 
         for (const submission of submissions) {
             try {
@@ -331,13 +332,18 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
                     }
                 });
 
-                await updateStreakAndActivity(userId, solvedAt ?? new Date());
+                solvedDates.push(solvedAt ?? new Date());
 
                 synced++;
             } catch (error) {
                 console.warn(`Failed to sync problem:`, error.message);
                 failed++;
             }
+        }
+
+        // Recalculate streak once after all submissions
+        if (solvedDates.length > 0) {
+            await bulkUpdateActivity(userId, solvedDates);
         }
 
         await updatePlatformSyncMeta(userId, {

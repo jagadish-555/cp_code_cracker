@@ -1,9 +1,10 @@
+import 'dotenv/config.js';
 import app from './app.js';
 import { prisma } from './config/prisma.js';
 import { startPlatformStatsSync } from './jobs/syncPlatformStats.js';
 import { startContestSync } from './jobs/syncContests.js';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3001;
 
 
 const startServer = async () =>{

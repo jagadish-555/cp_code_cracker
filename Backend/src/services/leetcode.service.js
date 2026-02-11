@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { prisma } from '../config/prisma.js';
-import { updateStreakAndActivity } from './streak.service.js';
+import { bulkUpdateActivity } from './streak.service.js';
 
 const LEETCODE_API = 'https://leetcode.com/graphql';
 
@@ -197,6 +197,7 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
         let synced = 0;
         let created = 0;
         let failed = 0;
+        const solvedDates = [];
 
         for (const submission of submissions) {
             try {
@@ -249,7 +250,7 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                     }
                 });
 
-                await updateStreakAndActivity(userId, new Date(submission.timestamp * 1000));
+                solvedDates.push(new Date(submission.timestamp * 1000));
 
                 synced++;
             } catch (error) {
@@ -259,6 +260,11 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                 );
                 failed++;
             }
+        }
+
+        // Recalculate streak once after all submissions
+        if (solvedDates.length > 0) {
+            await bulkUpdateActivity(userId, solvedDates);
         }
 
         const easySolved = userStats.stats?.find(s => s.difficulty === 'Easy')?.count || 0;

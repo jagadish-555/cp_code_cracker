@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { prisma } from '../config/prisma.js';
-import { updateStreakAndActivity } from './streak.service.js';
+import { bulkUpdateActivity } from './streak.service.js';
 
 const CODEFORCES_API = 'https://codeforces.com/api';
 
@@ -91,6 +91,7 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
         let synced = 0;
         let created = 0;
         let failed = 0;
+        const solvedDates = [];
 
         for (const submission of submissions) {
             try {
@@ -145,7 +146,7 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
                     }
                 });
 
-                await updateStreakAndActivity(userId, new Date(submission.timestamp * 1000));
+                solvedDates.push(new Date(submission.timestamp * 1000));
 
                 synced++;
             } catch (error) {
@@ -155,6 +156,11 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
                 );
                 failed++;
             }
+        }
+
+        // Recalculate streak once after all submissions
+        if (solvedDates.length > 0) {
+            await bulkUpdateActivity(userId, solvedDates);
         }
 
         console.log(

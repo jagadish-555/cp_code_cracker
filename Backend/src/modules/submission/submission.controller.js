@@ -2,7 +2,7 @@ import { prisma } from '../../config/prisma.js';
 import { syncUserSolvedProblems } from '../../services/codeforces.service.js';
 import { syncUserSolvedLeetCode } from '../../services/leetcode.service.js';
 import { syncUserSolvedCodeChef } from '../../services/codechef.service.js';
-import { updateStreakAndActivity } from '../../services/streak.service.js';
+import { updateStreakAndActivity, getUserStreakWithReset } from '../../services/streak.service.js';
 
 
 export const markProblemAsSolved = async (req, res) => {
@@ -192,15 +192,9 @@ export const getUserStreak = async (req, res) => {
     try {
         const userId = req.user.userId;
 
-        const streak = await prisma.streak.findUnique({
-            where: { userId }
-        });
+        const streakData = await getUserStreakWithReset(userId);
 
-        res.status(200).json({
-            currentStreak: streak?.currentStreak || 0,
-            longestStreak: streak?.longestStreak || 0,
-            lastActiveDate: streak?.lastActiveDate || null
-        });
+        res.status(200).json(streakData);
     } catch (error) {
         console.error('Error fetching streak:', error);
         res.status(500).json({ error: error.message });
