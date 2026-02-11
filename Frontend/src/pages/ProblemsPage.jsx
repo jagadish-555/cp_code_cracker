@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { apiClient } from '../api/client';
 import { ExternalLink, Filter } from 'lucide-react';
+import { codeforcesLogo, codechefLogo, leetcodeLogo } from '../assets';
 
 const getDifficultyColor = (difficulty) => {
   if (!difficulty) return 'bg-neutral-500/10 text-neutral-400 border-neutral-400/20';
@@ -14,11 +15,11 @@ const getDifficultyColor = (difficulty) => {
 
 const getPlatformIcon = (platform) => {
   const icons = {
-    cf: '⚡',
-    lc: '🔥',
-    cc: '👨‍💻',
+    cf: <img src={codeforcesLogo} alt="Codeforces" className="w-5 h-5" />,
+    lc: <img src={leetcodeLogo} alt="LeetCode" className="w-5 h-5" />,
+    cc: <img src={codechefLogo} alt="CodeChef" className="w-5 h-5" />,
   };
-  return icons[platform?.toLowerCase()] || '📋';
+  return icons[platform?.toLowerCase()] ;
 };
 
 const formatDate = (date) => {
@@ -43,17 +44,14 @@ export const ProblemsPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  console.log('ProblemsPage rendered');
-
   const platforms = [
-    { value: 'all', label: 'All Platforms', icon: '🌐' },
-    { value: 'cf', label: 'Codeforces', icon: '⚡' },
-    { value: 'lc', label: 'LeetCode', icon: '🔥' },
-    { value: 'cc', label: 'CodeChef', icon: '👨‍💻' },
+    { value: 'all', label: 'All Platforms', icon: '' },
+    { value: 'cf', label: 'Codeforces', icon: <img src={codeforcesLogo} alt="Codeforces" className="w-6 h-6" /> },
+    { value: 'lc', label: 'LeetCode', icon: <img src={leetcodeLogo} alt="LeetCode" className="w-6 h-6" /> },
+    { value: 'cc', label: 'CodeChef', icon: <img src={codechefLogo} alt="CodeChef" className="w-6 h-6" /> },
   ];
 
   useEffect(() => {
-    console.log('useEffect triggered for:', { selectedPlatform, page });
     fetchProblems();
   }, [selectedPlatform, page]);
 
@@ -69,18 +67,12 @@ export const ProblemsPage = () => {
         params.platform = selectedPlatform;
       }
 
-      console.log('Fetching with params:', params);
       const res = await apiClient.get('/submissions/solved', { params });
-      console.log('Response received:', res.data);
-      console.log('Problems array:', res.data.problems);
-      console.log('Total count:', res.data.totalCount);
-      
       setProblems(res.data.problems || []);
       setTotalPages(res.data.totalPages || 1);
       setTotalCount(res.data.totalCount || 0);
     } catch (err) {
-      console.error('API Error:', err);
-      console.error('Error response:', err.response?.data);
+      console.error('Failed to load problems:', err);
       setProblems([]);
       setTotalPages(1);
       setTotalCount(0);

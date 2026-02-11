@@ -7,7 +7,7 @@ const buildHeatmapValues = (data) => {
 
   const activityMap = {};
   items.forEach((item) => {
-    const dateKey = item.date.split('T')[0]; // Normalize to YYYY-MM-DD
+    const dateKey = item.date.split('T')[0]; 
     activityMap[dateKey] = item.activityCount || 0;
   });
   
@@ -15,7 +15,7 @@ const buildHeatmapValues = (data) => {
   const today = new Date();
   const oneYearAgo = new Date(today);
   oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-  oneYearAgo.setDate(oneYearAgo.getDate() + 1); // Start from day after 1 year ago
+  oneYearAgo.setDate(oneYearAgo.getDate() + 1); 
   
   const allDays = [];
   const currentDate = new Date(oneYearAgo);

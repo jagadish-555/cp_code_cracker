@@ -6,11 +6,12 @@ import { ActivityHeatmap } from '../components/ActivityHeatmap';
 import { apiClient } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { RefreshCw, Link as LinkIcon, CheckCircle, AlertCircle, Check, X } from 'lucide-react';
+import { codeforcesLogo, codechefLogo, leetcodeLogo } from '../assets';
 
 const platforms = [
-  { key: 'cf', name: 'Codeforces', icon: '⚡' },
-  { key: 'lc', name: 'LeetCode', icon: '🔥' },
-  { key: 'cc', name: 'CodeChef', icon: '👨‍💻' },
+  { key: 'cf', name: 'Codeforces', icon: <img src={codeforcesLogo} alt="Codeforces" className="w-6 h-6" /> },
+  { key: 'lc', name: 'LeetCode', icon: <img src={leetcodeLogo} alt="LeetCode" className="w-6 h-6" /> },
+  { key: 'cc', name: 'CodeChef', icon: <img src={codechefLogo} alt="CodeChef" className="w-6 h-6" /> },
 ];
 
 const SkeletonBlock = ({ className = '' }) => (
@@ -28,9 +29,9 @@ export const ProfilePage = () => {
   const [heatmapLoading, setHeatmapLoading] = useState(true);
 
   const [syncing, setSyncing] = useState({});
-  const [syncResult, setSyncResult] = useState({}); // { cf: 'success' | 'error' }
+  const [syncResult, setSyncResult] = useState({}); 
 
-  // ── Fetch all profile data ───────────────────────────────────
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -38,7 +39,7 @@ export const ProfilePage = () => {
         const res = await apiClient.get('/auth/me');
         const u = res.data.user;
 
-        // Linked accounts map
+
         const accounts = {};
         u.platformAccounts?.forEach((a) => (accounts[a.platform] = a.handle));
         setLinkedAccounts(accounts);
@@ -74,7 +75,7 @@ export const ProfilePage = () => {
     Promise.all([fetchProfile(), fetchHeatmap()]);
   }, []);
 
-  // ── Sync handler ─────────────────────────────────────────────
+
   const handleSync = async (platformKey) => {
     const platformName = platforms.find((p) => p.key === platformKey)?.name;
     setSyncing((prev) => ({ ...prev, [platformKey]: true }));
@@ -94,22 +95,20 @@ export const ProfilePage = () => {
       setSyncResult((prev) => ({ ...prev, [platformKey]: 'error' }));
     } finally {
       setSyncing((prev) => ({ ...prev, [platformKey]: false }));
-      // Clear result after 4 seconds
       setTimeout(() => setSyncResult((prev) => ({ ...prev, [platformKey]: null })), 4000);
     }
   };
 
-  // ── Render ───────────────────────────────────────────────────
+
   return (
     <DashboardLayout>
-      {/* Page header */}
+
       <div className="mb-8">
         <p className="text-xs text-white/50 uppercase tracking-wider mb-2">Account</p>
         <h1 className="text-4xl md:text-5xl font-bold text-white font-mono">Profile</h1>
       </div>
 
       <div className="space-y-8">
-        {/* ── Hero card ─────────────────────────────────────── */}
         {loading ? (
           <div className="border border-neutral-700/30 rounded-lg p-8">
             <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
@@ -125,7 +124,6 @@ export const ProfilePage = () => {
           <ProfileHero user={user} linkedAccounts={linkedAccounts} />
         )}
 
-        {/* ── Stats strip ───────────────────────────────────── */}
         {loading ? (
           <div className="grid grid-cols-3 gap-4 py-6 border-b border-neutral-700/30">
             {[1, 2, 3].map((i) => (
@@ -139,10 +137,8 @@ export const ProfilePage = () => {
           statsData && <StatusStrip stats={statsData} />
         )}
 
-        {/* ── Activity heatmap ──────────────────────────────── */}
         <ActivityHeatmap data={heatmapData} loading={heatmapLoading} />
 
-        {/* ── Platform accounts management ──────────────────── */}
         <div className="pt-2">
           <p className="text-xs text-white/50 uppercase tracking-wider mb-4">Connected Platforms</p>
 
@@ -187,7 +183,6 @@ export const ProfilePage = () => {
                         {isSyncing ? 'Syncing...' : 'Sync Now'}
                       </button>
 
-                      {/* Inline feedback */}
                       {result === 'success' && (
                         <p className="text-xs text-emerald-400 flex items-center gap-1 justify-center">
                           <Check size={12} /> Synced successfully

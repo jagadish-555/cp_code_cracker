@@ -29,11 +29,11 @@
 
 @layer components {
   .neo-button {
-    @apply px-4 py-2 border border-neutral-700/30 bg-[#111118] text-[#f0f0f0] font-medium transition-all duration-200 hover:border-[#4cc9f0] hover:bg-[#1a1a23];
+    @apply px-4 py-2 border border-neutral-700/30 bg-[#111118] text-[#f0f0f0] font-medium transition-all duration-200 hover:border-neutral-600/50 hover:bg-[#1a1a23];
   }
 
   .neo-button-primary {
-    @apply px-4 py-2 border border-[#4cc9f0] bg-[#4cc9f0] text-[#0b0b0f] font-medium transition-all duration-200 hover:shadow-lg hover:shadow-[#4cc9f0]/30 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-4 py-2 border border-[#4cc9f0] bg-[#4cc9f0] text-[#0b0b0f] font-medium transition-all duration-200 hover:bg-[#3db8e0] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .neo-button-secondary {

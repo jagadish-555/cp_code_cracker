@@ -23,12 +23,13 @@ export const Sidebar = ({ onClose }) => {
         { name: 'Problems', path: '/problems', icon: BookOpen },
       ],
     },
-    {
-      title: 'SOCIAL',
-      items: [
-        { name: 'Friends', path: '/friends', icon: Users },
-      ],
-    },
+    // for later 
+    // {
+    //   title: 'SOCIAL',
+    //   items: [
+    //     { name: 'Friends', path: '/friends', icon: Users },
+    //   ],
+    // },
     {
       title: 'ACCOUNT',
       items: [

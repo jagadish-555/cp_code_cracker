@@ -35,7 +35,7 @@ export const DashboardPage = () => {
         
         const totalSolved = userData.userProblems?.filter(p => p.status === 'solved')?.length || 0;
         const currentStreak = userData.streak?.currentStreak || 0;
-        const maxStreak = userData.streak?.longestStreak || 0;
+        const maxStreak = userData.streak?.maxStreak || userData.streak?.longestStreak || 0;
 
         setStats({
           totalSolved,

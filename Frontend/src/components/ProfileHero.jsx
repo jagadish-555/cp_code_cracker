@@ -1,18 +1,20 @@
 import React from 'react';
 import { Calendar, CheckCircle, AlertCircle } from 'lucide-react';
+import {codechefLogo, codeforcesLogo, leetcodeLogo} from '../assets';
+
 
 const platformMeta = {
-  cf: { name: 'Codeforces', icon: '⚡', color: 'text-blue-400' },
-  lc: { name: 'LeetCode', icon: '🔥', color: 'text-yellow-400' },
-  cc: { name: 'CodeChef', icon: '👨‍💻', color: 'text-orange-400' },
+  cf: { name: 'Codeforces', icon: <img src={codeforcesLogo} alt="Codeforces" className="w-4 h-4" />, color: 'text-blue-400' },
+  lc: { name: 'LeetCode', icon: <img src={leetcodeLogo} alt="LeetCode" className="w-4 h-4" />, color: 'text-yellow-400' },
+  cc: { name: 'CodeChef', icon: <img src={codechefLogo} alt="CodeChef" className="w-4 h-4" />, color: 'text-orange-400' },
 };
 
 const gradients = [
-  'from-blue-500 to-purple-600',
-  'from-emerald-500 to-cyan-600',
-  'from-orange-500 to-pink-600',
-  'from-indigo-500 to-blue-600',
-  'from-rose-500 to-amber-600',
+  'yellow-400',
+  'emerald-400',
+  'orange-400',
+  'blue-400',
+  'purple-400',
 ];
 
 const pickGradient = (name) => {
@@ -32,22 +34,19 @@ export const ProfileHero = ({ user, linkedAccounts }) => {
   const gradient = pickGradient(user?.username);
 
   return (
-    <div className="border border-neutral-700/30 rounded-lg overflow-hidden">
-      {/* Accent banner */}
-      <div className={`h-1.5 bg-gradient-to-r ${gradient}`} />
-
+    <div className="border border-neutral-700/30 rounded-lg bg-white/5 backdrop-blur-sm">
       <div className="p-6 md:p-8">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          {/* Avatar */}
+
           <div
-            className={`w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center flex-shrink-0 ring-2 ring-white/10`}
+            className={`w-20 h-20 md:w-24 md:h-24 rounded-full bg-${gradient} flex items-center justify-center flex-shrink-0 border-2 border-white/10`}
           >
             <span className="text-3xl md:text-4xl font-bold font-mono text-white select-none">
               {initial}
             </span>
           </div>
 
-          {/* Info */}
+
           <div className="flex-1 text-center md:text-left">
             <h2 className="text-2xl md:text-3xl font-bold text-white font-heading">
               {user?.username || 'Unknown'}
@@ -59,7 +58,7 @@ export const ProfileHero = ({ user, linkedAccounts }) => {
               <span>Member since {formatDate(user?.createdAt)}</span>
             </div>
 
-            {/* Platform badges */}
+
             <div className="flex items-center justify-center md:justify-start gap-3 mt-4 flex-wrap">
               {Object.entries(platformMeta).map(([key, meta]) => {
                 const linked = !!linkedAccounts[key];

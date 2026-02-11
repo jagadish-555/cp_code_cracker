@@ -4,7 +4,7 @@ export const FormInput = ({ label, error, ...inputProps }) => {
   return (
     <div>
       {label && (
-        <label className="block text-sm font-medium text-[#f0f0f0] mb-2">
+        <label className="block text-sm font-medium text-white mb-2">
           {label}
         </label>
       )}
