@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
         needsPlatformSetup 
       };
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Login failed';
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || 'Login failed';
       setError(errorMessage);
       return { success: false, error: errorMessage };
     }
