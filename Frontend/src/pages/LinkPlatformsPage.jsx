@@ -6,7 +6,7 @@ import { FormError } from '../components/FormError';
 import { codechefLogo, codeforcesLogo, leetcodeLogo } from '../assets';
 export const LinkPlatformsPage = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [handles, setHandles] = useState({
     codeforces: '',
     leetcode: '',
@@ -27,7 +27,25 @@ export const LinkPlatformsPage = () => {
     leetcode: null,
     codechef: null,
   });
-  const [linkedCount, setLinkedCount] = useState(0);
+
+  // Map backend platform codes to frontend keys
+  const platformCodeToKey = { cf: 'codeforces', lc: 'leetcode', cc: 'codechef' };
+
+  // Initialize already-linked platforms from user data
+  useEffect(() => {
+    if (user?.platformAccounts) {
+      const newStatus = { codeforces: null, leetcode: null, codechef: null };
+      user.platformAccounts.forEach((acc) => {
+        const key = platformCodeToKey[acc.platform];
+        if (key) {
+          newStatus[key] = 'success';
+        }
+      });
+      setStatus(newStatus);
+    }
+  }, [user]);
+
+  const linkedCount = Object.values(status).filter((s) => s === 'success').length;
 
   const platforms = [
     {
@@ -80,11 +98,17 @@ export const LinkPlatformsPage = () => {
         platformUsername: handle,
       });
       setStatus((prev) => ({ ...prev, [platform]: 'success' }));
-      const newLinkedCount = linkedCount + 1;
-      setLinkedCount(newLinkedCount);
       setHandles((prev) => ({ ...prev, [platform]: '' }));
 
-      if (newLinkedCount === 3) {
+      // Refresh user data in AuthContext so hasAllPlatforms updates
+      const updatedUser = await refreshUser();
+
+      // Check if all 3 are now linked (count from updated status + this one)
+      const updatedLinkedCount = Object.values({ ...status, [platform]: 'success' }).filter(
+        (s) => s === 'success'
+      ).length;
+
+      if (updatedLinkedCount === 3) {
         setTimeout(() => {
           navigate('/dashboard');
         }, 1000);

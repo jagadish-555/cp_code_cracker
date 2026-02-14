@@ -90,6 +90,16 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authApi.getCurrentUser();
+      setUser(response.data.user);
+      return response.data.user;
+    } catch (err) {
+      return null;
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -97,6 +107,7 @@ export const AuthProvider = ({ children }) => {
     signup,
     login,
     logout,
+    refreshUser,
     isAuthenticated: !!user,
     hasAllPlatforms: hasAllPlatforms(user),
   };

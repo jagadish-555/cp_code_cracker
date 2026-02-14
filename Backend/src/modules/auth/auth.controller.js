@@ -3,6 +3,13 @@ import { prisma } from '../../config/prisma.js';
 
 import { generateToken } from '../../middlewares/auth.middleware.js';
 
+const cookieOptions = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
+
 const getPlatformUrl = (platform, username) => {
     const urls = {
         leetcode: `https://leetcode.com/u/${username}/`,
@@ -35,11 +42,7 @@ export const signup = async (req, res) => {
 
         const token = generateToken(newUser.id);
 
-        res.cookie('accessToken', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
-        });
+        res.cookie('accessToken', token, cookieOptions);
 
 
         res.status(201).json({
@@ -72,11 +75,7 @@ export const login = async (req, res) => {
 
         const token = generateToken(user.id);
 
-        res.cookie('accessToken', token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
-        });
+        res.cookie('accessToken', token, cookieOptions);
 
         res.status(200).json({
             message: 'Login successful',
@@ -89,7 +88,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.clearCookie('accessToken');
+    res.clearCookie('accessToken', cookieOptions);
     res.status(200).json({ message: 'Logout successful' });
 };
 
