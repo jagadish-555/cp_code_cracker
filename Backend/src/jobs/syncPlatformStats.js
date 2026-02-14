@@ -30,7 +30,7 @@ const runPlatformSync = async () => {
 export const startPlatformStatsSync = () => {
 	const intervalMs = SYNC_JOB_INTERVAL_HOURS * 60 * 60 * 1000;
 
-	// Delay initial sync to avoid hammering APIs on every dev restart
+
 	const initialDelay = process.env.NODE_ENV === 'production' ? 0 : 60000;
 	setTimeout(() => {
 		runPlatformSync();
