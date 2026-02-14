@@ -16,7 +16,7 @@ async function fetchAndSyncContests() {
     const sixtyDaysFromNow = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
 
     const params = {
-      limit: 200,
+      limit: 20,
       offset: 0,
       start__gte: now.toISOString().split("T")[0],
       start__lte: sixtyDaysFromNow.toISOString().split("T")[0],
