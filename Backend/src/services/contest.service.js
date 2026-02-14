@@ -16,8 +16,6 @@ async function fetchAndSyncContests() {
     const sixtyDaysFromNow = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
 
     const params = {
-      username: CLIST_USERNAME,
-      api_key: CLIST_TOKEN,
       limit: 200,
       offset: 0,
       start__gte: now.toISOString().split("T")[0],
@@ -25,10 +23,13 @@ async function fetchAndSyncContests() {
       resource__in: "codeforces.com,leetcode.com,codechef.com",
     };
 
-    console.log("[ContestSync] Fetching from clist.by with params:", { ...params, api_key: "***" });
+    console.log("[ContestSync] Fetching from clist.by with params:", params);
 
     const response = await axios.get(CLIST_API_URL, {
       params,
+      headers: {
+        Authorization: `ApiKey ${CLIST_USERNAME}:${CLIST_TOKEN}`,
+      },
       timeout: 15000,
     });
 
