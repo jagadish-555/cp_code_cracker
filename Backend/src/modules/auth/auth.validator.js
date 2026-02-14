@@ -23,7 +23,11 @@ export const validateRequest = (schema) => {
             req.validated = validated;
             next();
         } catch (error) {
-            const errors = error.errors.map(e => `${e.path.join('.')}: ${e.message}`);
-            res.status(400).json({ error: errors });
+            const issues = error.issues || error.errors || [];
+            const errors = issues.map(e => {
+                const path = (e.path || []).join('.');
+                return path ? `${path}: ${e.message}` : e.message;
+            });
+            res.status(400).json({ error: errors.length > 0 ? errors : [error.message] });
         }
     }};

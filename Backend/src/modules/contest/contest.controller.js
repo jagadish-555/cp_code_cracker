@@ -44,7 +44,7 @@ const syncContests = asyncHandler(async (req, res) => {
 });
 
 const addContestReminder = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const { contestId, reminderMinutesBefore = 60 } = req.body;
 
   if (!contestId) {
@@ -98,7 +98,7 @@ const addContestReminder = asyncHandler(async (req, res) => {
 });
 
 const getUserReminders = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const { upcoming = true } = req.query;
 
   let where = {
@@ -143,7 +143,7 @@ const getUserReminders = asyncHandler(async (req, res) => {
 });
 
 const removeContestReminder = asyncHandler(async (req, res) => {
-  const userId = req.user.id;
+  const userId = req.user.userId;
   const { reminderId } = req.params;
 
   const reminder = await prisma.contestReminder.findUnique({

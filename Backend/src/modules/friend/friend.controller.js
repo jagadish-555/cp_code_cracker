@@ -14,7 +14,7 @@ export const sendFriendRequest = async (req, res) => {
         });
 
         if (!friend) {
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({ error: 'No user found with that email' });
         }
 
         if (friend.id === userId) {
@@ -26,13 +26,25 @@ export const sendFriendRequest = async (req, res) => {
                 OR: [
                     { requesterId: userId, addresseeId: friend.id },
                     { requesterId: friend.id, addresseeId: userId }
-                ]
+                ],
+                status: { in: ['pending', 'accepted'] }
             }
         });
 
         if (existingFriendship) {
-            return res.status(400).json({ error: 'Friend request already exists' });
+            return res.status(400).json({ error: 'Friend request already exists or already friends' });
         }
+
+        // Delete any previously rejected request so a new one can be created
+        await prisma.friendship.deleteMany({
+            where: {
+                OR: [
+                    { requesterId: userId, addresseeId: friend.id },
+                    { requesterId: friend.id, addresseeId: userId }
+                ],
+                status: 'rejected'
+            }
+        });
 
         const friendship = await prisma.friendship.create({
             data: {

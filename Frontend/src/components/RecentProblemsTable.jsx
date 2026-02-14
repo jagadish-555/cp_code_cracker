@@ -48,9 +48,6 @@ export const RecentProblemsTable = ({ problems, loading, onPageChange, page, tot
                     Platform
                   </th>
                   <th className="px-4 md:px-6 py-3 text-left text-xs font-semibold text-white/70 uppercase tracking-wider">
-                    Difficulty
-                  </th>
-                  <th className="px-4 md:px-6 py-3 text-left text-xs font-semibold text-white/70 uppercase tracking-wider">
                     Solved
                   </th>
                 </tr>
@@ -73,11 +70,6 @@ export const RecentProblemsTable = ({ problems, loading, onPageChange, page, tot
                     </td>
                     <td className="px-4 md:px-6 py-4 text-sm text-white/70">
                       {problem.platform}
-                    </td>
-                    <td className="px-4 md:px-6 py-4">
-                      <span className={`text-xs px-2 py-1 rounded border inline-block ${getDifficultyColor(problem.difficulty)}`}>
-                        {problem.difficulty}
-                      </span>
                     </td>
                     <td className="px-4 md:px-6 py-4 text-sm text-white/70">
                       {formatDate(problem.solvedAt)}

@@ -27,8 +27,11 @@ function startContestSync() {
     `[ContestSync] Initializing background job (interval: ${SYNC_INTERVAL_HOURS}h)`
   );
 
-
-  runContestSync();
+  // Delay initial sync to avoid hammering APIs on every dev restart
+  const initialDelay = process.env.NODE_ENV === 'production' ? 0 : 60000;
+  setTimeout(() => {
+    runContestSync();
+  }, initialDelay);
 
 
   const intervalMs = SYNC_INTERVAL_HOURS * 60 * 60 * 1000;

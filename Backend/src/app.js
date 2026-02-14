@@ -35,7 +35,7 @@ app.get('/api/health', (req, res) => {
 
 app.use((err, req, res, next) => {
     console.error('Error:', err);
-    const status = err.status || 500;
+    const status = err.statusCode || err.status || 500;
     const message = err.message || 'Internal Server Error';
     res.status(status).json({ error: message });
 });

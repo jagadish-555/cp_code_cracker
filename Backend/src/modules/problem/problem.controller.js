@@ -2,7 +2,9 @@ import { prisma } from '../../config/prisma.js';
 
 export const getAllProblems = async (req, res) => {
     try {
-        const { platform, difficulty, page = 1, limit = 50 } = req.query;
+        const { platform, difficulty } = req.query;
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 50));
 
         const where = {};
         if (platform) where.platform = platform;
@@ -14,7 +16,7 @@ export const getAllProblems = async (req, res) => {
             prisma.problem.findMany({
                 where,
                 skip,
-                take: parseInt(limit),
+                take: limit,
                 orderBy: { createdAt: 'desc' }
             }),
             prisma.problem.count({ where })
@@ -23,8 +25,8 @@ export const getAllProblems = async (req, res) => {
         res.status(200).json({
             problems,
             pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
+                page,
+                limit,
                 total,
                 totalPages: Math.ceil(total / limit)
             }

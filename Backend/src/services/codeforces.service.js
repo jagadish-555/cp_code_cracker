@@ -43,7 +43,7 @@ export const fetchCodeForcesUserStats = async (handle) => {
 
 export const fetchUserSubmissions = async (handle) => {
     try {
-        console.log(`🔄 Fetching submissions for ${handle}...`);
+        console.log(`Fetching submissions for ${handle}...`);
         const response = await axios.get(
             `${CODEFORCES_API}/user.status?handle=${handle}&from=1&count=10000`,
             { timeout: 30000 }
@@ -73,10 +73,10 @@ export const fetchUserSubmissions = async (handle) => {
             }
         }
 
-        console.log(`✅ Found ${uniqueSolved.size} unique solved problems`);
+        console.log(`Found ${uniqueSolved.size} unique solved problems`);
         return Array.from(uniqueSolved.values());
     } catch (error) {
-        console.error(`❌ Error fetching submissions for ${handle}:`, error.message);
+        console.error(`Error fetching submissions for ${handle}:`, error.message);
         throw error;
     }
 };
@@ -117,7 +117,7 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
                             platformProblemId,
                             title: submission.name,
                             difficulty: submission.rating ? `${submission.rating}` : null,
-                            tags: JSON.stringify(submission.tags),
+                            tags: submission.tags,
                             url: `https://codeforces.com/problemset/problem/${submission.contestId}/${submission.index}`
                         }
                     });
@@ -207,7 +207,7 @@ export const syncUserSolvedProblems = async (userId, codeforcesHandle) => {
 
         return { synced, created, failed, total: submissions.length, rating: userStats.rating, maxRating: userStats.maxRating, rank: userStats.rank };
     } catch (error) {
-        console.error(`❌ Error syncing user ${codeforcesHandle}:`, error.message);
+        console.error(`Error syncing user ${codeforcesHandle}:`, error.message);
         throw error;
     }
 };

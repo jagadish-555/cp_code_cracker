@@ -150,7 +150,8 @@ export const fetchCodeChefSubmissions = async (username) => {
                             const problemCode = contestMatch[2];
                             const fullUrl = `https://www.codechef.com/${contestCode}/problems/${problemCode}`;
                             
-                            if (!problems.has(problemCode)) {
+                            const isAccepted = resultStatus === 'AC' || resultStatus === 'accepted';
+                            if (!problems.has(problemCode) && isAccepted) {
                                 problems.set(problemCode, {
                                     name: problemName,
                                     link: fullUrl,
@@ -301,7 +302,7 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
                             platformProblemId,
                             title: submission.name,
                             difficulty: null,
-                            tags: JSON.stringify([]),
+                            tags: [],
                             url: submission.link
                         }
                     });
@@ -370,7 +371,7 @@ export const syncUserSolvedCodeChef = async (userId, username) => {
                 rating: userStats.rating,
                 solved: synced,
                 maxRating: userStats.rating,
-                stars: synced > 0 ? Math.ceil(synced / 50) : 0
+                stars: null
             }
         }).catch(() => {});
 

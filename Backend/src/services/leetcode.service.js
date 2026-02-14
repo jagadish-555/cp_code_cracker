@@ -55,7 +55,9 @@ export const fetchLeetCodeUserStats = async (username) => {
 
         const ranking = user.profile?.ranking || null;
         const acStats = user.submitStatsGlobal?.acSubmissionNum || [];
-        const totalSolved = acStats.reduce((sum, stat) => sum + stat.count, 0);
+        const totalSolved = acStats
+            .filter(stat => stat.difficulty !== 'All')
+            .reduce((sum, stat) => sum + stat.count, 0);
 
         console.log(`LeetCode stats for ${username}: ranking=${ranking}, totalSolved=${totalSolved}`);
 
@@ -158,7 +160,7 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                     }
                 },
                 update: {
-                    rating: userStats.totalSolved,
+                    rating: userStats.ranking,
                     solved: 0,
                     easySolved,
                     mediumSolved,
@@ -171,7 +173,7 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                 create: {
                     userId,
                     platform: 'lc',
-                    rating: userStats.totalSolved,
+                    rating: userStats.ranking,
                     solved: 0,
                     easySolved,
                     mediumSolved,
@@ -221,8 +223,8 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                             platform: 'lc',
                             platformProblemId,
                             title: submission.title,
-                            difficulty: submission.difficulty,
-                            tags: JSON.stringify([submission.titleSlug]),
+                            difficulty: null,
+                            tags: [submission.titleSlug],
                             url: submission.url
                         }
                     });
@@ -279,7 +281,7 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
                 }
             },
             update: {
-                rating: userStats.totalSolved,
+                rating: userStats.ranking,
                 solved: synced,
                 easySolved,
                 mediumSolved,
@@ -295,7 +297,7 @@ export const syncUserSolvedLeetCode = async (userId, leetcodeUsername) => {
             create: {
                 userId,
                 platform: 'lc',
-                rating: userStats.totalSolved,
+                rating: userStats.ranking,
                 solved: synced,
                 easySolved,
                 mediumSolved,

@@ -10,16 +10,6 @@ const cookieOptions = {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
-const getPlatformUrl = (platform, username) => {
-    const urls = {
-        leetcode: `https://leetcode.com/u/${username}/`,
-        codeforces: `https://codeforces.com/profile/${username}`,
-        codechef: `https://www.codechef.com/users/${username}`,
-        atcoder: `https://atcoder.jp/users/${username}`
-    };
-    return urls[platform] || `https://${platform}.com/${username}`;
-};
-
 export const signup = async (req, res) => {
     try {
         const { email, password, username } = req.validated;
@@ -30,12 +20,21 @@ export const signup = async (req, res) => {
             return res.status(400).json({ error: 'Email already registered' });
         }
 
+        const existingUsername = await prisma.user.findFirst({
+            where: { usernameLower: username.toLowerCase() }
+        });
+
+        if (existingUsername) {
+            return res.status(400).json({ error: 'Username already taken' });
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const newUser = await prisma.user.create({
             data: {
                 email,
                 username,
+                usernameLower: username.toLowerCase(),
                 password: hashedPassword
             }
         });
@@ -88,7 +87,8 @@ export const login = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.clearCookie('accessToken', cookieOptions);
+    const { maxAge, ...clearOptions } = cookieOptions;
+    res.clearCookie('accessToken', clearOptions);
     res.status(200).json({ message: 'Logout successful' });
 };
 
@@ -141,7 +141,12 @@ export const getCurrentUser = async (req, res) => {
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            include: {
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                createdAt: true,
+                updatedAt: true,
                 platformAccounts: true,
                 platformStats: true,
                 streak: true,
